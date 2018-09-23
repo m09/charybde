@@ -3,6 +3,7 @@
 from bz2 import BZ2File
 from collections import Counter, defaultdict
 import re
+from pathlib import Path
 from typing import Counter as Counter_type, Iterable, Mapping, Tuple
 
 from tqdm import tqdm
@@ -54,7 +55,7 @@ def parse_dumps(dump_paths: Iterable[str], langs: Tuple[str, ...] = tuple()
         yield from parse_dump(dump_path, langs)
 
 
-def create_csv_dataset_from_dump(dump_paths: str, output_csv_path: str,
+def create_csv_dataset_from_dump(dumps_folder_path: str, output_csv_path: str,
                                  langs: Tuple[str, ...] = tuple()) -> None:
     """
     Create a bz2-compressed TSV file of a dataset created from several wiktionaries.
@@ -65,8 +66,10 @@ def create_csv_dataset_from_dump(dump_paths: str, output_csv_path: str,
     """
     Counts = Mapping[str, Mapping[str, Counter_type[int]]]
     counts: Counts = defaultdict(lambda: defaultdict(Counter))
-    for word, lang, count in tqdm(parse_dumps(dump_paths, langs=langs)):
-        counts[lang][word][count] += 1
+    for file in Path(dumps_folder_path).iterdir():
+        if file.is_file() and file.name.endswith(".xml.bz2"):
+            for word, lang, count in tqdm(parse_dump(str(file), langs=langs)):
+                counts[lang][word][count] += 1
     with BZ2File(output_csv_path, "w") as fh:
         for lang, lang_stats in tqdm(counts.items()):
             for word, word_stats in tqdm(lang_stats.items()):
