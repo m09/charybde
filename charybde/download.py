@@ -41,12 +41,12 @@ class Downloader:
             output_path = join(self.output_dir, filename)
             if Path(output_path).is_file() and self._sha1sum(output_path) == sha1:
                 continue
-            response = get("%s/%s" % (self.mirror, url), stream=True)
             with open(output_path, 'wb') as fh, self._create_pbar(filename, size) as pbar:
-                for chunk in response.iter_content(chunk_size=1024):
-                    if chunk:
-                        chunk_size = fh.write(chunk)
-                        pbar.update(chunk_size)
+                with get("%s/%s" % (self.mirror, url), stream=True) as response:
+                    for chunk in response.iter_content(chunk_size=1024):
+                        if chunk:
+                            chunk_size = fh.write(chunk)
+                            pbar.update(chunk_size)
             if self._sha1sum(output_path) != sha1:
                 rmtree(output_path)
                 raise RequestException()
