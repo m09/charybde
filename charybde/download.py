@@ -4,6 +4,7 @@ from hashlib import sha1
 from os import makedirs
 from os.path import join
 from pathlib import Path
+from shutil import rmtree
 from typing import Iterable
 
 from bs4 import BeautifulSoup
@@ -47,6 +48,7 @@ class Downloader:
                         chunk_size = fh.write(chunk)
                         pbar.update(chunk_size)
             if self._sha1sum(output_path) != sha1:
+                rmtree(output_path)
                 raise RequestException()
 
     def find_wiktionaries_folders(self) -> Iterable[str]:
