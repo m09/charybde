@@ -1,0 +1,27 @@
+language: python
+sudo: false
+dist: xenial
+cache: pip
+before_cache:
+  - chown -R travis:travis $HOME/.cache/pip
+stages:
+  - test
+_install: &_install
+  - pip install --upgrade pip codecov
+  - pip install -e .[test]
+_coverage: &_coverage
+  - SCRIPT="coverage run --concurrency=multiprocessing -m unittest discover && coverage combine"
+matrix:
+  include:
+    - python: 3.6
+      env: *_coverage
+      install: *_install
+    - python: 3.6
+      env: SCRIPT="flake8 .
+                   && cd doc && make"
+      install: pip install -r doc/requirements.txt flake8
+  fast_finish: true
+script:
+  - (eval "$SCRIPT")
+notifications:
+  email: false
