@@ -33,7 +33,7 @@ def parse_dump(dump_path: str, langs: Tuple[str, ...] = tuple()) -> Iterable[Tup
         langs_joined = "|".join(langs)
     else:
         langs_joined = ".+?"
-    pattern = re.compile(r"'''(.+?)''' \{\{pron\|(.+?)\|(%s)}}" % langs_joined)
+    pattern = re.compile(r"'''(.+?)''' \{\{pron\|(.+?)\|(?:lang=)?(%s)}}" % langs_joined)
     with BZ2File(dump_path) as fh:
         for line in fh:
             match = pattern.search(line.decode("utf-8", "replace"))
@@ -55,13 +55,13 @@ def parse_dumps(dump_paths: Iterable[str], langs: Tuple[str, ...] = tuple()
         yield from parse_dump(dump_path, langs)
 
 
-def create_csv_dataset_from_dump(dumps_folder_path: str, output_csv_path: str,
+def create_csv_dataset_from_dump(dumps_folder_path: str, output_path: str,
                                  langs: Tuple[str, ...] = tuple()) -> None:
     """
     Create a bz2-compressed TSV file of a dataset created from several wiktionaries.
 
     :param dump_paths: Iterable of paths to the wiktionary dumps.
-    :param output_csv_path: Path to the output CSV file.
+    :param output_path: Path to the output compressed TSV file. Extension will be added.
     :param langs: Tuple of langs to consider. Empty tuple = consider all langs.
     """
     Counts = Mapping[str, Mapping[str, Counter_type[int]]]
@@ -70,7 +70,7 @@ def create_csv_dataset_from_dump(dumps_folder_path: str, output_csv_path: str,
         if file.is_file() and file.name.endswith(".xml.bz2"):
             for word, lang, count in tqdm(parse_dump(str(file), langs=langs)):
                 counts[lang][word][count] += 1
-    with BZ2File(output_csv_path, "w") as fh:
+    with BZ2File(output_path + ".tsv.bz2", "w") as fh:
         for lang, lang_stats in tqdm(counts.items()):
             for word, word_stats in tqdm(lang_stats.items()):
                 count = word_stats.most_common(n=1)[0][0]

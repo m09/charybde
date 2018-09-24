@@ -16,7 +16,8 @@ def create_parser() -> ArgumentParser:
     dataset_parser.add_argument("dumps_folder_path",
                                 help="Paths to the folder containing the dumps to gather data "
                                      "from.")
-    dataset_parser.add_argument("output_csv_path", help="Path to the output csv to write.")
+    dataset_parser.add_argument("output_path", help="Path to the output compressed TSV file. "
+                                                    "Extension will be added.")
     dataset_parser.add_argument("--langs", nargs="*", help="Langs to consider. Empty = all langs.")
     return parser
 
