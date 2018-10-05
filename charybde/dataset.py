@@ -2,8 +2,8 @@
 
 from bz2 import BZ2File
 from collections import Counter, defaultdict
-import re
 from pathlib import Path
+import re
 from typing import Counter as Counter_type, Iterable, Mapping, Tuple
 
 from tqdm import tqdm
@@ -21,7 +21,7 @@ def compute_counts(word: str, pronounciation: str, lang: str) -> int:
     return pronounciation.count(" ") + pronounciation.count(".") + 1
 
 
-def parse_dump(dump_path: str, langs: Tuple[str, ...] = tuple()) -> Iterable[Tuple[str, str, int]]:
+def parse_dump(dump_path: str, langs: Tuple[str, ...] = ()) -> Iterable[Tuple[str, str, int]]:
     """
     Return the words and the number of syllables found in a wiktionary dump.
 
@@ -42,7 +42,7 @@ def parse_dump(dump_path: str, langs: Tuple[str, ...] = tuple()) -> Iterable[Tup
                 yield word, lang, compute_counts(word, pronounciation, lang)
 
 
-def parse_dumps(dump_paths: Iterable[str], langs: Tuple[str, ...] = tuple()
+def parse_dumps(dump_paths: Iterable[str], langs: Tuple[str, ...] = ()
                 ) -> Iterable[Tuple[str, str, int]]:
     """
     Return the words and the number of syllables found in the given wiktionary dumps.
@@ -56,11 +56,11 @@ def parse_dumps(dump_paths: Iterable[str], langs: Tuple[str, ...] = tuple()
 
 
 def create_csv_dataset_from_dump(dumps_folder_path: str, output_path: str,
-                                 langs: Tuple[str, ...] = tuple()) -> None:
+                                 langs: Tuple[str, ...] = ()) -> None:
     """
     Create a bz2-compressed TSV file of a dataset created from several wiktionaries.
 
-    :param dump_paths: Iterable of paths to the wiktionary dumps.
+    :param dumps_folder_path: Path to the wiktionary dumps folder.
     :param output_path: Path to the output compressed TSV file. Extension will be added.
     :param langs: Tuple of langs to consider. Empty tuple = consider all langs.
     """

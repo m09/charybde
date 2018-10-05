@@ -41,7 +41,7 @@ class Downloader:
             output_path = join(self.output_dir, filename)
             if Path(output_path).is_file() and self._sha1sum(output_path) == sha1:
                 continue
-            with open(output_path, 'wb') as fh, self._create_pbar(filename, size) as pbar:
+            with open(output_path, "wb") as fh, self._create_pbar(filename, size) as pbar:
                 with get("%s/%s" % (self.mirror, url), stream=True) as response:
                     for chunk in response.iter_content(chunk_size=1024):
                         if chunk:
@@ -83,8 +83,8 @@ class Downloader:
         :return: The SHA1 hash of the file.
         """
         hash = sha1()
-        with open(filename, 'rb') as fh:
-            for chunk in iter(lambda: fh.read(128 * 1024), b''):
+        with open(filename, "rb") as fh:
+            for chunk in iter(lambda: fh.read(128 * 1024), b""):
                 hash.update(chunk)
         return hash.hexdigest()
 

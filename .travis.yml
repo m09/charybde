@@ -18,8 +18,15 @@ matrix:
       install: *_install
     - python: 3.6
       env: SCRIPT="flake8 .
+                   && pylint charybde
                    && cd doc && make"
-      install: pip install -r doc/requirements.txt flake8
+      install: "pip install -r doc/requirements.txt
+                            flake8
+                            flake8
+                            flake8-bugbear
+                            flake8-import-order
+                            flake8-quotes
+                            pylint"
   fast_finish: true
 script:
   - (eval "$SCRIPT")

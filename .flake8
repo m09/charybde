@@ -1,3 +1,12 @@
 [flake8]
+ignore=E121,E123,E126,E226,E24,E704,W503,W504
 max-line-length=99
-exclude=.git
+exclude=
+    .git
+    charybde.egg-info
+    dataset
+    wiktionaries
+    doc
+inline-quotes="
+import-order-style=appnexus
+application-package-names=charybde
