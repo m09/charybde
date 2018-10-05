@@ -15,7 +15,7 @@ from tqdm import tqdm
 class Downloader:
     """Wiktionaries downloader."""
 
-    def __init__(self, output_dir: str, mirror: str = "https://dumps.wikimedia.org/") -> None:
+    def __init__(self, output_dir: str, mirror: str = "https://dumps.wikimedia.org") -> None:
         """
         Construct a wiktionaries downloader.
 

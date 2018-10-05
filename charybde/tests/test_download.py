@@ -10,7 +10,8 @@ tests_dir = str(Path(__file__).parent)
 class DownloadTests(TestCase):
 
     def setUp(self):
-        self.downloader = Downloader(tests_dir)
+        self.downloader = Downloader(tests_dir, mirror="https://web.archive.org"
+                                     "/web/20180927140006/https://dumps.wikimedia.org/")
 
     def test_find_wiktionaries_folders(self):
         results = set(self.downloader.find_wiktionaries_folders())
