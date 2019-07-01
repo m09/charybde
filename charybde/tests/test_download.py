@@ -1,27 +1,25 @@
 from pathlib import Path
-from unittest import main, TestCase
+
+from pytest import fixture
 
 from charybde.download import Downloader
 
 
-tests_dir = str(Path(__file__).parent)
+@fixture
+def downloader() -> Downloader:
+    return Downloader(
+        str(Path(__file__).parent),
+        mirror="https://web.archive.org"
+        "/web/20180927140006/https://dumps.wikimedia.org/",
+    )
 
 
-class DownloadTests(TestCase):
-
-    def setUp(self):
-        self.downloader = Downloader(tests_dir, mirror="https://web.archive.org"
-                                     "/web/20180927140006/https://dumps.wikimedia.org/")
-
-    def test_find_wiktionaries_folders(self):
-        results = set(self.downloader.find_wiktionaries_folders())
-        self.assertGreater(len(results), 50)
-        self.assertIn("enwiktionary", (folder.split("/")[0] for folder in results))
-
-    def test_download_from_wiktionary_dump_folder(self):
-        folder = "mhwiktionary/20180920"
-        self.downloader.download_from_wiktionary_dump_folder(folder)
+def test_find_wiktionaries_folders(downloader: Downloader) -> None:
+    results = set(downloader.find_wiktionaries_folders())
+    assert len(results) > 50
+    assert "enwiktionary" in (folder.split("/")[0] for folder in results)
 
 
-if __name__ == "__main__":
-    main()
+def test_download_from_wiktionary_dump_folder(downloader: Downloader) -> None:
+    folder = "mhwiktionary/20180920"
+    downloader.download_from_wiktionary_dump_folder(folder)

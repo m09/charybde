@@ -11,7 +11,7 @@ spec = spec_from_file_location("charybde", str(root / "charybde" / "__init__.py"
 charybde = module_from_spec(spec)
 spec.loader.exec_module(charybde)  # type: ignore
 
-long_description = "\n" + (root / "README.md").read_text()
+long_description = "\n" + (root / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="charybde",
@@ -19,8 +19,8 @@ setup(
     description="Count syllables with neural networks.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="Hugo Mougard",
-    author_email="hugo@mougard.fr",
+    author="m09",
+    author_email="142691+m09@users.noreply.github.com",
     python_requires=">=3.6.0",
     url="https://github.com/m09/charybde",
     packages=find_packages(exclude=("tests",)),
@@ -38,6 +38,6 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
-        "Topic :: Text Processing"
-    ]
+        "Topic :: Text Processing",
+    ],
 )
