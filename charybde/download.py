@@ -15,11 +15,13 @@ from tqdm import tqdm
 class Downloader:
     """Wiktionaries downloader."""
 
-    def __init__(self, output_dir: str, mirror: str = "https://dumps.wikimedia.org") -> None:
+    def __init__(
+        self, output_dir: str, mirror: str = "https://dumps.wikimedia.org"
+    ) -> None:
         """
         Construct a wiktionaries downloader.
 
-        :param output_dir: Path to the output folder where the wiktionaries will be downloaded.
+        :param output_dir: Path to the folder where the wiktionaries will be downloaded.
         :param mirror: Wikimedia mirror to use.
         """
         self.output_dir = output_dir
@@ -41,7 +43,9 @@ class Downloader:
             output_path = join(self.output_dir, filename)
             if Path(output_path).is_file() and self._sha1sum(output_path) == sha1:
                 continue
-            with open(output_path, "wb") as fh, self._create_pbar(filename, size) as pbar:
+            with open(output_path, "wb") as fh, self._create_pbar(
+                filename, size
+            ) as pbar:
                 with get("%s/%s" % (self.mirror, url), stream=True) as response:
                     for chunk in response.iter_content(chunk_size=1024):
                         if chunk:
@@ -71,7 +75,7 @@ class Downloader:
         for folder in self.find_wiktionaries_folders():
             try:
                 self.download_from_wiktionary_dump_folder(folder)
-            except RequestException as e:
+            except RequestException:
                 print("Warning: folder %s could not be downloaded." % folder)
 
     @staticmethod

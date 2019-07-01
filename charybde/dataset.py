@@ -21,7 +21,9 @@ def compute_counts(word: str, pronounciation: str, lang: str) -> int:
     return pronounciation.count(" ") + pronounciation.count(".") + 1
 
 
-def parse_dump(dump_path: str, langs: Tuple[str, ...] = ()) -> Iterable[Tuple[str, str, int]]:
+def parse_dump(
+    dump_path: str, langs: Tuple[str, ...] = ()
+) -> Iterable[Tuple[str, str, int]]:
     """
     Return the words and the number of syllables found in a wiktionary dump.
 
@@ -33,7 +35,9 @@ def parse_dump(dump_path: str, langs: Tuple[str, ...] = ()) -> Iterable[Tuple[st
         langs_joined = "|".join(langs)
     else:
         langs_joined = ".+?"
-    pattern = re.compile(r"'''(.+?)''' \{\{pron\|(.+?)\|(?:lang=)?(%s)}}" % langs_joined)
+    pattern = re.compile(
+        r"'''(.+?)''' \{\{pron\|(.+?)\|(?:lang=)?(%s)}}" % langs_joined
+    )
     with BZ2File(dump_path) as fh:
         for line in fh:
             match = pattern.search(line.decode("utf-8", "replace"))
@@ -42,8 +46,9 @@ def parse_dump(dump_path: str, langs: Tuple[str, ...] = ()) -> Iterable[Tuple[st
                 yield word, lang, compute_counts(word, pronounciation, lang)
 
 
-def parse_dumps(dump_paths: Iterable[str], langs: Tuple[str, ...] = ()
-                ) -> Iterable[Tuple[str, str, int]]:
+def parse_dumps(
+    dump_paths: Iterable[str], langs: Tuple[str, ...] = ()
+) -> Iterable[Tuple[str, str, int]]:
     """
     Return the words and the number of syllables found in the given wiktionary dumps.
 
@@ -55,8 +60,9 @@ def parse_dumps(dump_paths: Iterable[str], langs: Tuple[str, ...] = ()
         yield from parse_dump(dump_path, langs)
 
 
-def create_csv_dataset_from_dump(dumps_folder_path: str, output_path: str,
-                                 langs: Tuple[str, ...] = ()) -> None:
+def create_csv_dataset_from_dump(
+    dumps_folder_path: str, output_path: str, langs: Tuple[str, ...] = ()
+) -> None:
     """
     Create a bz2-compressed TSV file of a dataset created from several wiktionaries.
 

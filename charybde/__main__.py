@@ -10,15 +10,23 @@ def create_parser() -> ArgumentParser:
     parser = ArgumentParser("Create datasets to train neural nets to count syllables.")
     subparsers = parser.add_subparsers(help="Commands", dest="command")
     download_parser = subparsers.add_parser("download", help="Download wiktionaries.")
-    download_parser.add_argument("output_dir", help="Path to the directory where files should be "
-                                                    "downloaded")
-    dataset_parser = subparsers.add_parser("dataset", help="Create a dataset out of wiktionaries.")
-    dataset_parser.add_argument("dumps_folder_path",
-                                help="Paths to the folder containing the dumps to gather data "
-                                     "from.")
-    dataset_parser.add_argument("output_path", help="Path to the output compressed TSV file. "
-                                                    "Extension will be added.")
-    dataset_parser.add_argument("--langs", nargs="*", help="Langs to consider. Empty = all langs.")
+    download_parser.add_argument(
+        "output_dir", help="Path to the directory where files should be " "downloaded"
+    )
+    dataset_parser = subparsers.add_parser(
+        "dataset", help="Create a dataset out of wiktionaries."
+    )
+    dataset_parser.add_argument(
+        "dumps_folder_path",
+        help="Paths to the folder containing the dumps to gather data " "from.",
+    )
+    dataset_parser.add_argument(
+        "output_path",
+        help="Path to the output compressed TSV file. " "Extension will be added.",
+    )
+    dataset_parser.add_argument(
+        "--langs", nargs="*", help="Langs to consider. Empty = all langs."
+    )
     return parser
 
 

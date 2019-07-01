@@ -1,31 +1,27 @@
 from pathlib import Path
-from unittest import main, TestCase
+
+from pytest import fixture
 
 from charybde.dataset import parse_dump
 
 
-class DatasetTests(TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.small_dataset_path = str(Path(__file__).parent / "small_dump.xml.bz2")
-
-    def test_parse_dump(self):
-        results = set(parse_dump(self.small_dataset_path, tuple()))
-        self.assertIn(("accueil", "fr", 2), results)
-        self.assertIn(("lire", "fr", 1), results)
-        self.assertIn(("lire", "fro", 1), results)
-
-        results = set(parse_dump(self.small_dataset_path, ("fr",)))
-        self.assertIn(("accueil", "fr", 2), results)
-        self.assertIn(("lire", "fr", 1), results)
-        self.assertNotIn(("lire", "fro", 1), results)
-
-        results = set(parse_dump(self.small_dataset_path, ("fr", "fro")))
-        self.assertIn(("accueil", "fr", 2), results)
-        self.assertIn(("lire", "fr", 1), results)
-        self.assertIn(("lire", "fro", 1), results)
+@fixture(scope="session")
+def small_dataset_path() -> str:
+    return str(Path(__file__).parent / "small_dump.xml.bz2")
 
 
-if __name__ == "__main__":
-    main()
+def test_parse_dump(small_dataset_path: str) -> None:
+    results = set(parse_dump(small_dataset_path, tuple()))
+    assert ("accueil", "fr", 2) in results
+    assert ("lire", "fr", 1) in results
+    assert ("lire", "fro", 1) in results
+
+    results = set(parse_dump(small_dataset_path, ("fr",)))
+    assert ("accueil", "fr", 2) in results
+    assert ("lire", "fr", 1) in results
+    assert ("lire", "fro", 1) not in results
+
+    results = set(parse_dump(small_dataset_path, ("fr", "fro")))
+    assert ("accueil", "fr", 2) in results
+    assert ("lire", "fr", 1) in results
+    assert ("lire", "fro", 1) in results
