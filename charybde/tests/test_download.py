@@ -1,17 +1,19 @@
-from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Iterator
 
 from pytest import fixture
 
 from charybde.download import Downloader
 
 
-@fixture
-def downloader() -> Downloader:
-    return Downloader(
-        str(Path(__file__).parent),
-        mirror="https://web.archive.org"
-        "/web/20180927140006/https://dumps.wikimedia.org/",
-    )
+@fixture(scope="module")
+def downloader() -> Iterator[Downloader]:
+    with TemporaryDirectory(prefix="charybde-") as temp_dir:
+        yield Downloader(
+            temp_dir,
+            mirror="https://web.archive.org"
+            "/web/20180927140006/https://dumps.wikimedia.org/",
+        )
 
 
 def test_find_wiktionaries_folders(downloader: Downloader) -> None:
