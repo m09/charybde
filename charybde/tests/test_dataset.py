@@ -5,7 +5,7 @@ from pytest import fixture
 from charybde.dataset import parse_dump
 
 
-@fixture(scope="session")
+@fixture(scope="module")
 def small_dataset_path() -> str:
     return str(Path(__file__).parent / "small_dump.xml.bz2")
 
