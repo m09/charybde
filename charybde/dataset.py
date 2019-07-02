@@ -23,7 +23,7 @@ def compute_counts(word: str, pronounciation: str, lang: str) -> int:
 
 def parse_dump(
     dump_path: str, langs: Tuple[str, ...] = ()
-) -> Iterable[Tuple[str, str, int]]:
+) -> Iterable[Tuple[str, str, str, int]]:
     """
     Return the words and the number of syllables found in a wiktionary dump.
 
@@ -43,12 +43,13 @@ def parse_dump(
             match = pattern.search(line.decode("utf-8", "replace"))
             if match:
                 word, pronounciation, lang = match.groups()
-                yield word, lang, compute_counts(word, pronounciation, lang)
+                count = compute_counts(word, pronounciation, lang)
+                yield word, pronounciation, lang, count
 
 
 def parse_dumps(
     dump_paths: Iterable[str], langs: Tuple[str, ...] = ()
-) -> Iterable[Tuple[str, str, int]]:
+) -> Iterable[Tuple[str, str, str, int]]:
     """
     Return the words and the number of syllables found in the given wiktionary dumps.
 
@@ -70,14 +71,21 @@ def create_csv_dataset_from_dump(
     :param output_path: Path to the output compressed TSV file. Extension will be added.
     :param langs: Tuple of langs to consider. Empty tuple = consider all langs.
     """
-    Counts = Mapping[str, Mapping[str, Counter_type[int]]]
-    counts: Counts = defaultdict(lambda: defaultdict(Counter))
+    Counts = Mapping[str, Mapping[str, Mapping[str, Counter_type[int]]]]
+    counts: Counts = defaultdict(lambda: defaultdict(lambda: defaultdict(Counter)))
     for file in Path(dumps_folder_path).iterdir():
         if file.is_file() and file.name.endswith(".xml.bz2"):
-            for word, lang, count in tqdm(parse_dump(str(file), langs=langs)):
-                counts[lang][word][count] += 1
+            for word, pronounciation, lang, count in tqdm(
+                parse_dump(str(file), langs=langs)
+            ):
+                counts[lang][word][pronounciation][count] += 1
     with BZ2File(output_path + ".tsv.bz2", "w") as fh:
         for lang, lang_stats in tqdm(counts.items()):
-            for word, word_stats in tqdm(lang_stats.items()):
-                count = word_stats.most_common(n=1)[0][0]
-                fh.write(("%s\t%s\t%d\n" % (word, lang, count)).encode("utf-8"))
+            for word, word_stats in lang_stats.items():
+                for pronounciation, pronounciation_stats in word_stats.items():
+                    count = pronounciation_stats.most_common(n=1)[0][0]
+                    fh.write(
+                        (
+                            "%s\t%s\t%s\t%d\n" % (word, pronounciation, lang, count)
+                        ).encode("utf-8")
+                    )
