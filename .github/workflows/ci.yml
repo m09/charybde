@@ -1,0 +1,27 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.6
+    - name: Setup the package
+      run: pip install .
+    - name: Test the package
+      run: >-
+        pip install pytest codecov
+        && coverage run -m pytest
+        && coverage xml --include "charybde/*"
+        && codecov -t ${{ secrets.CODECOV_TOKEN }}
+        -f coverage.xml
+        -b ${{ github.ref }}
+    - name: Build the doc
+      run: cd doc && pip install -r requirements.txt && make
