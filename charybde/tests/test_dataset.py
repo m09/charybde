@@ -10,7 +10,7 @@ def small_fr_dataset_path() -> str:
     return str(Path(__file__).parent / "small_fr_dump.xml.bz2")
 
 
-def test_fr_parser_dump(small_dataset_path: str) -> None:
+def test_fr_parser_dump(small_fr_dataset_path: str) -> None:
     fr_parser = FrParser()
     results = set(fr_parser.parse(small_fr_dataset_path, tuple()))
     assert ("accueil", "a.kœj", "fr", 2) in results

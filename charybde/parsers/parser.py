@@ -44,8 +44,8 @@ def register_parser(language_code: str) -> Callable[[Type[Parser]], Type[Parser]
     return wrapper
 
 
-import_submodules(".".join(__name__.split(".")[:-2]))
-
-
 def get_parser(language_code: str) -> Type[Parser]:
     return _parsers[language_code]
+
+
+import_submodules(".".join(__name__.split(".")[:-2]))
