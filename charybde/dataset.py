@@ -2,54 +2,29 @@
 
 from bz2 import BZ2File
 from collections import Counter, defaultdict
+from logging import getLogger
 from pathlib import Path
-import re
-from typing import Counter as Counter_type, Iterable, Mapping, Tuple
+from re import match as re_match
+from typing import Counter as Counter_type, Iterable, Iterator, Mapping, Optional, Tuple
 
 from tqdm import tqdm
 
-
-def compute_counts(word: str, pronounciation: str, lang: str) -> int:
-    """
-    Return the number of syllables of a word.
-
-    :param word: The word (sometimes multi-word like “Barbe à papa”) in question.
-    :param pronounciation: The IPA pronounciation of the word.
-    :param lang: The lang of the word.
-    :return: The number of syllables in a word.
-    """
-    return pronounciation.count(" ") + pronounciation.count(".") + 1
+from charybde.parsers.parser import get_parser
 
 
-def parse_dump(
-    dump_path: str, langs: Tuple[str, ...] = ()
-) -> Iterable[Tuple[str, str, str, int]]:
-    """
-    Return the words and the number of syllables found in a wiktionary dump.
+_logger = getLogger(__name__)
 
-    :param dump_path: Path to the wiktionary dump.
-    :param langs: Tuple of langs to consider. Empty tuple = consider all langs.
-    :return: Iterable of tuples comprised of a word, its lang and its syllable count.
-    """
-    if langs:
-        langs_joined = "|".join(langs)
-    else:
-        langs_joined = ".+?"
-    pattern = re.compile(
-        r"'''(.+?)''' \{\{pron\|(.+?)\|(?:lang=)?(%s)}}" % langs_joined
-    )
-    with BZ2File(dump_path) as fh:
-        for line in fh:
-            match = pattern.search(line.decode("utf-8", "replace"))
-            if match:
-                word, pronounciation, lang = match.groups()
-                count = compute_counts(word, pronounciation, lang)
-                yield word, pronounciation, lang, count
+
+def _language_code(path: Path) -> str:
+    match = re_match(r"^(.+)wiktionary-.*$", path.name)
+    if match is None:
+        raise ValueError("Could not detect the language of the dump %s" % path)
+    return match.group(1)
 
 
 def parse_dumps(
-    dump_paths: Iterable[str], langs: Tuple[str, ...] = ()
-) -> Iterable[Tuple[str, str, str, int]]:
+    dump_paths: Iterable[Path], langs: Optional[Tuple[str, ...]] = ()
+) -> Iterator[Tuple[str, str, str, int]]:
     """
     Return the words and the number of syllables found in the given wiktionary dumps.
 
@@ -58,11 +33,21 @@ def parse_dumps(
     :return: Iterable of tuples comprised of a word, its lang and its syllable count.
     """
     for dump_path in dump_paths:
-        yield from parse_dump(dump_path, langs)
+        language_code = _language_code(dump_path)
+        try:
+            parser = get_parser(language_code)()
+            yield from parser.parse(dump_path, langs)
+        except KeyError:
+            _logger.warning(
+                "Could not find a parser class for language code %s", language_code
+            )
 
 
 def create_csv_dataset_from_dump(
-    dumps_folder_path: str, output_path: str, langs: Tuple[str, ...] = ()
+    dumps_folder_path: str,
+    output_path: str,
+    langs: Optional[Tuple[str, ...]],
+    dumps: Optional[Tuple[str, ...]],
 ) -> None:
     """
     Create a bz2-compressed TSV file of a dataset created from several wiktionaries.
@@ -71,14 +56,19 @@ def create_csv_dataset_from_dump(
     :param output_path: Path to the output compressed TSV file. Extension will be added.
     :param langs: Tuple of langs to consider. Empty tuple = consider all langs.
     """
+
     Counts = Mapping[str, Mapping[str, Mapping[str, Counter_type[int]]]]
     counts: Counts = defaultdict(lambda: defaultdict(lambda: defaultdict(Counter)))
-    for file in Path(dumps_folder_path).iterdir():
-        if file.is_file() and file.name.endswith(".xml.bz2"):
-            for word, pronounciation, lang, count in tqdm(
-                parse_dump(str(file), langs=langs)
-            ):
-                counts[lang][word][pronounciation][count] += 1
+    dump_paths = [
+        p
+        for p in Path(dumps_folder_path).iterdir()
+        if p.is_file()
+        and p.name.endswith(".xml.bz2")
+        and (dumps is None or _language_code(p) in dumps)
+    ]
+    for word, pronounciation, lang, count in parse_dumps(dump_paths):
+        counts[lang][word][pronounciation][count] += 1
+
     with BZ2File(output_path + ".tsv.bz2", "w") as fh:
         for lang, lang_stats in tqdm(counts.items()):
             for word, word_stats in lang_stats.items():

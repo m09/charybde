@@ -25,7 +25,12 @@ def create_parser() -> ArgumentParser:
         help="Path to the output compressed TSV file. " "Extension will be added.",
     )
     dataset_parser.add_argument(
-        "--langs", nargs="*", help="Langs to consider. Empty = all langs."
+        "--langs", nargs="+", help="Langs to consider. Not given = all langs."
+    )
+    dataset_parser.add_argument(
+        "--dumps",
+        nargs="+",
+        help="Dumps to consider (by language code). Not given = all dumps.",
     )
     return parser
 
