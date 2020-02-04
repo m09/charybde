@@ -36,11 +36,12 @@ def parse_dumps(
         language_code = _language_code(dump_path)
         try:
             parser = get_parser(language_code)()
-            yield from parser.parse(dump_path, langs)
         except KeyError:
             _logger.warning(
                 "Could not find a parser class for language code %s", language_code
             )
+            raise
+        yield from parser.parse(dump_path, langs)
 
 
 def create_csv_dataset_from_dump(

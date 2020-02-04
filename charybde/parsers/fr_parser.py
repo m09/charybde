@@ -24,5 +24,5 @@ class FrParser(Parser):
                 match = pattern.search(line.decode("utf-8", "replace"))
                 if match:
                     word, pronounciation, lang = match.groups()
-                    count = self._compute_counts(word, pronounciation, lang)
+                    count = self._compute_counts(pronounciation)
                     yield word, pronounciation, lang, count

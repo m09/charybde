@@ -24,7 +24,7 @@ setup(
     python_requires=">=3.6.0",
     url="https://github.com/m09/charybde",
     packages=find_packages(exclude=("tests",)),
-    install_requires=["beautifulsoup4", "requests", "tqdm"],
+    install_requires=["beautifulsoup4", "requests", "tqdm", "xmltodict"],
     include_package_data=True,
     entry_points={"console_scripts": ["charybde=charybde.__main__:main"]},
     license="Apache Software License",

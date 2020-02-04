@@ -13,22 +13,22 @@ class Parser:
     ) -> Iterator[Tuple[str, str, str, int]]:
         raise NotImplementedError()
 
-    def _compute_counts(self, word: str, pronounciation: str, lang: str) -> int:
+    def _compute_counts(self, pronounciation: str) -> int:
         """
         Return the number of syllables of a word.
 
-        :param word: The word (sometimes multi-word like “Barbe à papa”) in question.
         :param pronounciation: The IPA pronounciation of the word.
-        :param lang: The lang of the word.
         :return: The number of syllables in a word.
         """
         return pronounciation.count(" ") + pronounciation.count(".") + 1
 
-    def _create_progress_bar(self, iterable: Iterable, language: str) -> TqdmType:
+    def _create_progress_bar(
+        self, iterable: Iterable, language: str, unit: str = "lines"
+    ) -> TqdmType:
         return tqdm(
             iterable,
             desc="Processing %s wiktionary" % language,
-            unit="lines",
+            unit=unit,
             unit_scale=True,
         )
 
