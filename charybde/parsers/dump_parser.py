@@ -1,6 +1,6 @@
 from bz2 import BZ2File
 from pathlib import Path
-from queue import SimpleQueue as Queue
+from queue import Queue
 from threading import Thread
 from typing import Any, Callable, Dict, Iterator, List, Tuple
 
