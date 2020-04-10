@@ -1,7 +1,0 @@
--c requirements.txt
-flake8
-flake8-bugbear
-flake8-import-order
-mypy
-black
-pytest

@@ -1,6 +1,6 @@
 check:
-	black --check charybde setup.py
-	mypy charybde setup.py
-	flake8 --count charybde setup.py
+	black --check charybde
+	mypy charybde
+	flake8 --count charybde
 
 .PHONY: check
