@@ -26,6 +26,7 @@ class Downloader:
         """
         self.output_dir = output_dir
         self.mirror = mirror
+        self.headers = {"User-Agent": "Charybde (+https://github.com/m09/charybde/)"}
         makedirs(output_dir, exist_ok=True)
 
     def download_from_wiktionary_dump_folder(self, url: str) -> None:
@@ -34,7 +35,9 @@ class Downloader:
 
         :param url: URL pointing to the wiktionary dump folder.
         """
-        response = get("%s/%s/dumpstatus.json" % (self.mirror, url))
+        response = get(
+            "%s/%s/dumpstatus.json" % (self.mirror, url), headers=self.headers
+        )
         response.raise_for_status()
         json = response.json()
         files = json["jobs"]["metacurrentdump"]["files"]
@@ -46,7 +49,9 @@ class Downloader:
             with open(output_path, "wb") as fh, self._create_pbar(
                 filename, size
             ) as pbar:
-                with get("%s/%s" % (self.mirror, url), stream=True) as response:
+                with get(
+                    "%s/%s" % (self.mirror, url), stream=True, headers=self.headers
+                ) as response:
                     for chunk in response.iter_content(chunk_size=1024):
                         if chunk:
                             chunk_size = fh.write(chunk)
@@ -61,7 +66,7 @@ class Downloader:
 
         :return: Iterable of URL pointing to wiktionary dump folders.
         """
-        response = get("%s/backup-index.html" % self.mirror)
+        response = get("%s/backup-index.html" % self.mirror, headers=self.headers)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         for li in soup.find_all("li"):
