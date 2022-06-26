@@ -8,7 +8,7 @@ from shutil import rmtree
 from typing import Iterable
 
 from bs4 import BeautifulSoup
-from requests import get, RequestException
+from requests import RequestException, get
 from tqdm import tqdm
 
 
@@ -21,8 +21,9 @@ class Downloader:
         """
         Construct a wiktionaries downloader.
 
-        :param output_dir: Path to the folder where the wiktionaries will be downloaded.
-        :param mirror: Wikimedia mirror to use.
+        Args:
+            output_dir: Path to the folder where the wiktionaries will be downloaded.
+            mirror: Wikimedia mirror to use.
         """
         self.output_dir = output_dir
         self.mirror = mirror
@@ -33,7 +34,8 @@ class Downloader:
         """
         Download a wiktionary dump from a wiktionary dump folder url.
 
-        :param url: URL pointing to the wiktionary dump folder.
+        Args:
+            url: URL pointing to the wiktionary dump folder.
         """
         response = get(
             "%s/%s/dumpstatus.json" % (self.mirror, url), headers=self.headers
@@ -64,7 +66,8 @@ class Downloader:
         """
         Find all available wiktionary dump folders from the Wikimedia dumps site.
 
-        :return: Iterable of URL pointing to wiktionary dump folders.
+        Returns:
+            Iterable of URL pointing to wiktionary dump folders.
         """
         response = get("%s/backup-index.html" % self.mirror, headers=self.headers)
         response.raise_for_status()
@@ -88,8 +91,11 @@ class Downloader:
         """
         Compute the SHA1 digest of a file.
 
-        :param filename: Path to the file to hash.
-        :return: The SHA1 hash of the file.
+        Args:
+            filename: Path to the file to hash.
+
+        Returns:
+            The SHA1 hash of the file.
         """
         hash = sha1()
         with open(filename, "rb") as fh:
@@ -102,8 +108,11 @@ class Downloader:
         """
         Create a tqdm progress bar to display download progress.
 
-        :param name: Name of the file being downloaded.
-        :param size: Size of the file being downloaded.
-        :return: Progress bar.
+        Args:
+            name: Name of the file being downloaded.
+            size: Size of the file being downloaded.
+
+        Returns:
+            Progress bar.
         """
         return tqdm(total=size, desc=name, unit="o", unit_scale=True)

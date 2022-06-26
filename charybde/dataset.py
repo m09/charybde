@@ -5,12 +5,12 @@ from collections import Counter, defaultdict
 from logging import getLogger
 from pathlib import Path
 from re import match as re_match
-from typing import Counter as Counter_type, Iterable, Iterator, Mapping, Optional, Tuple
+from typing import Counter as Counter_type
+from typing import Iterable, Iterator, Mapping, Optional, Tuple
 
 from tqdm import tqdm
 
 from charybde.parsers.parser import get_parser
-
 
 _logger = getLogger(__name__)
 
@@ -28,9 +28,13 @@ def parse_dumps(
     """
     Return the words and the number of syllables found in the given wiktionary dumps.
 
-    :param dump_paths: Iterable of paths to the wiktionary dumps.
-    :param langs: Tuple of langs to consider. Empty tuple = consider all langs.
-    :return: Iterable of tuples comprised of a word, its lang and its syllable count.
+    Args:
+        dump_paths: Iterable of paths to the wiktionary dumps.
+        langs: Tuple of langs to consider. Empty tuple = consider all langs.
+
+    Returns:
+        Iterator of tuples comprised of a word, its IPA, its lang and its syllable \
+            count.
     """
     for dump_path in dump_paths:
         language_code = _language_code(dump_path)
@@ -53,9 +57,11 @@ def create_csv_dataset_from_dump(
     """
     Create a bz2-compressed TSV file of a dataset created from several wiktionaries.
 
-    :param dumps_folder_path: Path to the wiktionary dumps folder.
-    :param output_path: Path to the output compressed TSV file. Extension will be added.
-    :param langs: Tuple of langs to consider. Empty tuple = consider all langs.
+    Args:
+        dumps_folder_path: Path to the wiktionary dumps folder.
+        output_path: Path to the output compressed TSV file. Extension will be added.
+        langs: Tuple of langs to consider. Empty tuple = consider all langs.
+        dumps: Dumps to consider. None = consider all dumps.
     """
 
     Counts = Mapping[str, Mapping[str, Mapping[str, Counter_type[int]]]]

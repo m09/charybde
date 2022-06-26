@@ -8,6 +8,16 @@ from xmltodict import parse as xmltodict_parse
 
 
 def parse(dump: Path) -> Iterator[Dict[str, Any]]:
+    """
+    Parse a dump into a stream a dictionaries.
+
+    Args:
+        dump: Path to the dump.
+
+    Returns:
+        An iterator of dictionaries as parsed by xmltodict.
+    """
+
     def filter(path: List[Tuple[str, Dict[str, str]]], item: Dict[str, Any]) -> bool:
         return (
             len(path) == 2
