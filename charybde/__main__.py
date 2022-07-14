@@ -34,6 +34,18 @@ def create_parser() -> ArgumentParser:
         nargs="+",
         help="Dumps to consider (by language code). Not given = all dumps.",
     )
+
+    filter_parser = subparsers.add_parser(
+        "filter", help="Create a dataset out of wiktionaries."
+    )
+    filter_parser.add_argument(
+        "dataset_path",
+        help="Path to the dataset to filter.",
+    )
+    filter_parser.add_argument(
+        "filtered_dataset_path",
+        help="Path to the output filtered dataset. Extension will be added.",
+    )
     return parser
 
 
@@ -52,6 +64,10 @@ def main() -> None:
         from charybde.dataset import create_csv_dataset_from_dump
 
         create_csv_dataset_from_dump(**vars(args))
+    elif command == "filter":
+        from charybde.filter import filter_dataset
+
+        filter_dataset(**vars(args))
 
 
 if __name__ == "__main__":

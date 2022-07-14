@@ -73,8 +73,10 @@ def create_csv_dataset_from_dump(
         and p.name.endswith(".xml.bz2")
         and (dumps is None or _language_code(p) in dumps)
     ]
+    forbidden_chars = frozenset(["{", "}", "[", "]"])
     for word, pronounciation, lang, count in parse_dumps(dump_paths):
-        counts[lang][word][pronounciation][count] += 1
+        if not frozenset(word) & forbidden_chars:
+            counts[lang][word][pronounciation][count] += 1
 
     with BZ2File(output_path + ".tsv.bz2", "w") as fh:
         for lang, lang_stats in tqdm(counts.items()):
