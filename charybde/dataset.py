@@ -18,7 +18,7 @@ _logger = getLogger(__name__)
 def _language_code(path: Path) -> str:
     match = re_match(r"^(.+)wiktionary-.*$", path.name)
     if match is None:
-        raise ValueError("Could not detect the language of the dump %s" % path)
+        raise ValueError(f"Could not detect the language of the dump {path}")
     return match.group(1)
 
 
@@ -42,7 +42,7 @@ def parse_dumps(
             parser = get_parser(language_code)()
         except KeyError:
             _logger.warning(
-                "Could not find a parser class for language code %s", language_code
+                f"Could not find a parser class for language code {language_code}"
             )
             raise
         yield from parser.parse(dump_path, langs)
@@ -82,7 +82,5 @@ def create_csv_dataset_from_dump(
                 for pronounciation, pronounciation_stats in word_stats.items():
                     count = pronounciation_stats.most_common(n=1)[0][0]
                     fh.write(
-                        (
-                            "%s\t%s\t%s\t%d\n" % (word, pronounciation, lang, count)
-                        ).encode("utf-8")
+                        f"{word}\t{pronounciation}\t{lang}\t{count}\n".encode("utf-8")
                     )

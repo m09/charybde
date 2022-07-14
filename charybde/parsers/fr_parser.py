@@ -16,7 +16,7 @@ class FrParser(Parser):
         else:
             langs_joined = ".+?"
         pattern = re_compile(
-            r"'''(.+?)''' \{\{pron\|(.+?)\|(?:lang=)?(%s)}}" % langs_joined
+            r"'''(.+?)''' \{\{pron\|(?:1=)?(.+?)\|(?:lang=)?(%s)}}" % langs_joined
         )
         # en_pattern = {{IPA|en|/əˈkeɪ.di.n̩/|/əˈkeɪ.dʒn̩/}}
         with BZ2File(str(dump_path)) as fh:

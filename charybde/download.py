@@ -5,7 +5,7 @@ from os import makedirs
 from os.path import join
 from pathlib import Path
 from shutil import rmtree
-from typing import Iterable
+from typing import Iterator
 
 from bs4 import BeautifulSoup
 from requests import RequestException, get
@@ -37,9 +37,7 @@ class Downloader:
         Args:
             url: URL pointing to the wiktionary dump folder.
         """
-        response = get(
-            "%s/%s/dumpstatus.json" % (self.mirror, url), headers=self.headers
-        )
+        response = get(f"{self.mirror}/{url}/dumpstatus.json", headers=self.headers)
         response.raise_for_status()
         json = response.json()
         files = json["jobs"]["metacurrentdump"]["files"]
@@ -52,7 +50,7 @@ class Downloader:
                 filename, size
             ) as pbar:
                 with get(
-                    "%s/%s" % (self.mirror, url), stream=True, headers=self.headers
+                    f"{self.mirror}/{url}", stream=True, headers=self.headers
                 ) as response:
                     for chunk in response.iter_content(chunk_size=1024):
                         if chunk:
@@ -62,14 +60,14 @@ class Downloader:
                 rmtree(output_path)
                 raise RequestException()
 
-    def find_wiktionaries_folders(self) -> Iterable[str]:
+    def find_wiktionaries_folders(self) -> Iterator[str]:
         """
         Find all available wiktionary dump folders from the Wikimedia dumps site.
 
         Returns:
-            Iterable of URL pointing to wiktionary dump folders.
+            Iterator of URL pointing to wiktionary dump folders.
         """
-        response = get("%s/backup-index.html" % self.mirror, headers=self.headers)
+        response = get(f"{self.mirror}/backup-index.html", headers=self.headers)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         for li in soup.find_all("li"):
@@ -84,7 +82,7 @@ class Downloader:
             try:
                 self.download_from_wiktionary_dump_folder(folder)
             except RequestException:
-                print("Warning: folder %s could not be downloaded." % folder)
+                print(f"Warning: folder {folder} could not be downloaded.")
 
     @staticmethod
     def _sha1sum(filename: str) -> str:
